@@ -1,0 +1,18 @@
+<div class="loader">
+  <div class="center loader__content">
+    <div class="animation">
+      <div class="background"></div>
+      <div class="bottom"></div>
+      <div class="top"></div>
+    </div>
+
+    <div class="loader__content__title">
+      @for (message of messages; track $index) {
+        <h2 class="typographyStyles-body-medium loader__content__title__text">
+          {{ message }}
+        </h2>
+      }
+    </div>
+    <img src="/assets/images/lenai.svg" alt="Powered by LenAI" />
+  </div>
+</div>
