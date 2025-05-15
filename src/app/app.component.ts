@@ -60,6 +60,13 @@ activeTableView=false
     { customId: 6, customParentId: 1, customName: 'Scrum Master' },
   ];
 
+isolatedNodes=[
+  { customId: 7, customParentId: null, customName: 'Other Position' },
+  { customId: 8, customParentId: 1, customName: 'Second Position' },
+  { customId: 9, customParentId: 1, customName: 'Third Position' },
+
+]
+
 
 
 
@@ -192,6 +199,16 @@ activeTableView=false
 
   applyFilters() {
     this.togglePanel()
+    this.isLoadingChart=true;
+    setTimeout(() => {
+      this.isLoadingChart=false;
+    }, 1000);
+  }
+
+  addNewNode($event: { from: number, to: number , node:any}) {
+
+    this.data.push({...$event.node, customParentId: $event.to})
+    this.isolatedNodes=this.isolatedNodes.filter(x=>x.customId!==$event.from)
     this.isLoadingChart=true;
     setTimeout(() => {
       this.isLoadingChart=false;

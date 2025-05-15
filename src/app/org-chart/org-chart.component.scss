@@ -29,7 +29,6 @@
   display: flex
 ;
   gap: 5px;
-  margin-bottom: 10px;
   border-radius: 4px;
   border: 1px solid #BBD2FF;
   background: #FFF;
@@ -69,4 +68,37 @@ select{
 .center{
   text-align: center;
   display: block;
+}
+
+.hide-scroll {
+  overflow: hidden; /* Oculta la barra de desplazamiento */
+  padding-right: 15px; /* Ajusta el contenido para que no salte */
+}
+
+.hide-scroll:hover {
+  overflow: auto; /* Muestra el scroll solo al pasar el ratón (opcional) */
+}
+
+.scroll-container {
+  scrollbar-width: none; /* Firefox */
+}
+
+.scroll-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari y Edge */
+}
+
+.btn-default {
+  padding: 5px !important;
+  background: #08348C;
+  color: #F4F4F4;
+  border-radius: 4px;
+  max-width: 120px;
+  margin-bottom: 2px;
+  margin-right: 2px;
+  margin-left: auto;
+  cursor: pointer;
+  text-align: center;
+  /* height: 4px; */
+  font-size: 16px;
+
 }

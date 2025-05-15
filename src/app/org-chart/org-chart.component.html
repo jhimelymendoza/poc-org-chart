@@ -1,6 +1,11 @@
 <div style="padding: 10px;
     display: flex;
+    gap: 10px;
+    align-items: center;
     justify-content: end">
+  <div>
+    <div class="btn-secondary" (click)="center()">Center</div>
+  </div>
   <div class="zoom-controls">
     <!--  <button (click)="setZoom(0.5)">50%</button>-->
     <!--  <button (click)="setZoom(0.7)">70%</button>-->
@@ -23,6 +28,51 @@
     </svg>
   </div>
 </div>
-<div #chartContainer id="chartContainer"></div>
+<div style="display:flex;justify-content: flex-start;
+    gap: 10px;">
+  <div style="width: 200px;
+    max-height: 800px;
+    overflow: auto;
+        scrollbar-width: none;
+    flex: 20%;
+    align-items: center;
+    display: flex;
+    flex-direction: column;">
+    <div *ngFor="let position of isolatedNodes" class="box__root" style="width:188px;margin: 5px">
+      <div>
+        <span class="center">{{ position.customName }}</span>
+        <div *ngFor="let column of selectedColumns" class="label-value">
+          <span class="label">{{column}}:</span>
+          <span class="value">{{position[column] || 'N/A'}} </span>
+        </div>
+      </div>
+      <div class="btn-default" (click)="selectIsolatedNode(position.customId)"> Link to position</div>
+    </div>
+  </div>
+  <div #chartContainer id="chartContainer" style="flex: 85%"></div>
+</div>
+
+<app-modal
+  [title]="'Link to new position'"
+  [isVisible]="showModal"
+  (close)="closeModal()">
+
+  <div style="    display: flex;gap: 10px;
+    align-items: center;">
+    <label> From: </label>
+    <label ><strong>{{customNameSelected()}}</strong></label>
+    <br>
+  </div>
+   <div style="    display: flex;gap: 10px;
+    align-items: center;">
+     <label> Position: </label>
+     <select  style="width: 100%"  [(ngModel)]="parentPositionSelected"  >
+       <option *ngFor="let position of data" [value]="position.customId">{{position.customName}}</option>
+     </select>
+     <br>
+     <div class="btn-default" (click)="addAsChild()"> Confirm</div>
+   </div>
+</app-modal>
+
 
 

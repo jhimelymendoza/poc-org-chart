@@ -80,7 +80,12 @@
 
 <div class="content">
   <div>
-    <app-org-chart *ngIf="!activeTableView && !isLoadingChart" [data]="data" [selectedColumns]="selectedColumns"></app-org-chart>
+    <app-org-chart *ngIf="!activeTableView && !isLoadingChart"
+                   [isolatedNodes]="isolatedNodes"
+                   [data]="data"
+                   [selectedColumns]="selectedColumns"
+                   (addNewNode)="addNewNode($event)"
+    ></app-org-chart>
     <div style="height: 300px" *ngIf="activeTableView">
       <br>
       <ag-grid-angular

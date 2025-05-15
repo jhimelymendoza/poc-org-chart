@@ -1,11 +1,25 @@
-import {Component, ElementRef, Input, OnChanges, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  ViewChild,
+  ViewEncapsulation
+} from '@angular/core';
 import { OrgChart } from 'd3-org-chart';
 import {FormsModule} from '@angular/forms';
 import * as d3 from 'd3';
+import {NgForOf} from '@angular/common';
+import {ModalComponent} from '../modal/modal.component';
 @Component({
   selector: 'app-org-chart',
   imports: [
-    FormsModule
+    FormsModule,
+    NgForOf,
+    ModalComponent
   ],
   templateUrl: './org-chart.component.html',
   styleUrl: './org-chart.component.scss',
@@ -14,7 +28,9 @@ import * as d3 from 'd3';
 export class OrgChartComponent implements OnInit, OnChanges {
 @ViewChild('chartContainer') chartContainer!: ElementRef;
 @Input() data: any[]=[];
+@Input() isolatedNodes: any[]=[];
 @Input() selectedColumns: string[]=[];
+@Output() addNewNode=new EventEmitter<any>();
   chart!:any;
   zoom=100
  otherThing='pepe'
@@ -78,122 +94,12 @@ export class OrgChartComponent implements OnInit, OnChanges {
         <span class="center">${node.data.customName}</span>
         ${generateDynamicContent()}
       </div>
+
     </div>
   `;
 
         return node.depth === 0 ? rootContent : childContent;
       })
-//       .nodeContent((node:any) => {
-//         console.log(node);
-//
-//         if(node.depth===0){
-//           return `<div
-//         class="box__root"
-//         style="width:${node.width}px;height:${node.height}px;"
-//       >
-//       <div>
-//        <span class="center" > ${node.data.customName }</span>
-//
-//       <div class="label-value">
-//         <span class="label">Stream:</span>
-//         <span class="value">M</span>
-//       </div>
-//         <div class="label-value">
-//         <span class="label">Level:</span>
-//         <span class="value">8</span>
-//       </div>
-//         <div class="label-value">
-//         <span class="label">Reporting Lines:</span>
-//         <span class="value">0</span>
-//       </div>
-//         <div class="label-value">
-//         <span class="label">Revenue Generation:</span>
-//         <span class="value">No</span>
-//       </div>
-//         <div class="label-value">
-//         <span class="label">Annual Revenue:</span>
-//         <span class="value">0</span>
-//       </div>
-//         <div class="label-value">
-//         <span class="label">Annual Revenue:</span>
-//         <span class="value">0</span>
-//       </div>
-//         <div class="label-value">
-//         <span class="label">Annual Revenue:</span>
-//         <span class="value">0</span>
-//       </div>
-//         <div class="label-value">
-//         <span class="label">Annual Revenue:</span>
-//         <span class="value">0</span>
-//       </div>
-//             <div class="label-value">
-//         <span class="label">Annual Revenue:</span>
-//         <span class="value">0</span>
-//       </div>
-//         <div class="label-value">
-//         <span class="label">Annual Revenue:</span>
-//         <span class="value">0</span>
-//
-//
-//
-// </div>
-//
-//        </div>`;
-//         }
-//         return `<div
-//         class="box"
-//         style="width:${node.width}px;height:${node.height}px;"
-//       >
-//       <div>
-//        <span class="center" > ${node.data.customName }</span>
-//
-//       <div class="label-value">
-//         <span class="label">Stream:</span>
-//         <span class="value">M</span>
-//       </div>
-//         <div class="label-value">
-//         <span class="label">Level:</span>
-//         <span class="value">8</span>
-//       </div>
-//         <div class="label-value">
-//         <span class="label">Reporting Lines:</span>
-//         <span class="value">0</span>
-//       </div>
-//         <div class="label-value">
-//         <span class="label">Revenue Generation:</span>
-//         <span class="value">No</span>
-//       </div>
-//         <div class="label-value">
-//         <span class="label">Annual Revenue:</span>
-//         <span class="value">0</span>
-//       </div>
-//           <div class="label-value">
-//         <span class="label">Annual Revenue:</span>
-//         <span class="value">0</span>
-//       </div>
-//         <div class="label-value">
-//         <span class="label">Annual Revenue:</span>
-//         <span class="value">0</span>
-//       </div>
-//         <div class="label-value">
-//         <span class="label">Annual Revenue:</span>
-//         <span class="value">0</span>
-//       </div>
-//             <div class="label-value">
-//         <span class="label">Annual Revenue:</span>
-//         <span class="value">0</span>
-//       </div>
-//         <div class="label-value">
-//         <span class="label">Annual Revenue:</span>
-//         <span class="value">0</span>
-//       </div>
-//
-//
-//
-// </div>
-//
-//        </div>`;
-//       })
       .onNodeClick((d: any) => this.handleNodeClick(d))
       // Añadir configuración para alinear en un solo eje horizontal
       .compact(false) // Evita el diseño compacto
@@ -246,5 +152,42 @@ export class OrgChartComponent implements OnInit, OnChanges {
     }
 
 }
+
+  protected readonly alert = alert;
+  showModal=false;
+  parentPositionSelected=1;
+  isolatedNodeSelected=0;
+  center() {
+    if (this.chart){
+      console.log('center')
+      this.chart.setCentered(1).render()
+    }
+
+  }
+
+  closeModal() {
+    this.showModal=false
+  }
+
+  addAsChild() {
+    this.addNewNode.emit({
+      from:this.isolatedNodeSelected,
+      to:this.parentPositionSelected,
+      node:this.isolatedNodes.find(x=>x.customId===this.isolatedNodeSelected)
+    })
+  }
+
+  remove(){
+
+  }
+
+  selectIsolatedNode(customId: number) {
+    this.isolatedNodeSelected=customId;
+    this.showModal=true;
+  }
+
+  customNameSelected() {
+    return this.isolatedNodes.find(x=>x.customId===this.isolatedNodeSelected)?.customName;
+  }
 }
 
