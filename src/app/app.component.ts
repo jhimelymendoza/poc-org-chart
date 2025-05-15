@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, HostListener, OnInit} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import {AppNavbarComponent} from './app-navbar/app-navbar.component';
 import {AppFooterComponent} from './app-footer/app-footer.component';
@@ -15,6 +15,7 @@ import {
   SizeColumnsToFitProvidedWidthStrategy
 } from 'ag-grid-community';
 import {HttpClient} from '@angular/common/http';
+import {ChangeDetection} from '@angular/cli/lib/config/workspace-schema';
 
 export interface IOlympicData {
   athlete: string,
@@ -124,6 +125,8 @@ isolatedNodes=[
     {"athlete":"Ole Einar Bjørndalen","age":28,"country":"Norway","year":2002,"date":"24/02/2002","sport":"Biathlon","gold":4,"silver":0,"bronze":0,"total":4}
   ];
 
+constructor(private change:ChangeDetectorRef) {
+}
 
   onBtUpdateHeaders() {
     this.gridApi.setGridOption("columnDefs", updatedHeaderColumnDefs);
@@ -202,6 +205,7 @@ isolatedNodes=[
     this.isLoadingChart=true;
     setTimeout(() => {
       this.isLoadingChart=false;
+      this.change.detectChanges()
     }, 1000);
   }
 
@@ -212,6 +216,21 @@ isolatedNodes=[
     this.isLoadingChart=true;
     setTimeout(() => {
       this.isLoadingChart=false;
+      this.change.detectChanges()
+
     }, 1000);
+  }
+
+  removeNode($event: any) {
+
+    this.isLoadingChart=true;
+    this.data=this.data.filter(x=>x.customId!==$event.customId)
+    this.isolatedNodes=[...this.isolatedNodes,$event]
+    setTimeout(() => {
+
+      this.isLoadingChart=false;
+      this.change.detectChanges()
+    }, 1000);
+    this.change.detectChanges()
   }
 }

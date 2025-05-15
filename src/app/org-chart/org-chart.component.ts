@@ -31,13 +31,20 @@ export class OrgChartComponent implements OnInit, OnChanges {
 @Input() isolatedNodes: any[]=[];
 @Input() selectedColumns: string[]=[];
 @Output() addNewNode=new EventEmitter<any>();
+  @Output() removeNode = new EventEmitter<any>();
   chart!:any;
   zoom=100
  otherThing='pepe'
   currentZoom: number = 1;
   constructor() {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    (window as any).removeNode = (id: number) => this.emitRemoveNode(id);
+  }
+  emitRemoveNode(id: number) {
+    console.log('emitRemoveNode', id);
+    this.removeNode.emit(this.data.find(x=>x.customId===id));
+  }
 
   ngAfterViewInit() {
     if (!this.chart) {
@@ -63,7 +70,9 @@ export class OrgChartComponent implements OnInit, OnChanges {
       .nodeId((dataItem:any) => dataItem.customId)
       .parentNodeId((dataItem:any) => dataItem.customParentId)
       .nodeContent((node: any) => {
-        console.log(node);
+        console.log(node, this)
+        // Verificar si el nodo es una hoja (no tiene hijos)
+        const isLeaf = !node.children || node.children.length === 0;
 
         // Crear el contenido dinámico basado en columnas seleccionadas
         const generateDynamicContent = () => {
@@ -77,42 +86,37 @@ export class OrgChartComponent implements OnInit, OnChanges {
             .join('');
         };
 
-        // Definir el estilo y estructura para el nodo raíz
-        const rootContent = `
-    <div class="box__root" style="width:${node.width}px;height:${node.height}px;">
+        // Botón de eliminar solo si es una hoja
+        const removeButton = isLeaf ? `
+    <button class="remove-btn" onclick="window.removeNode(${node.data.customId})">Remove</button>
+  ` : '';
+
+        // Definir el contenido para el nodo raíz y los nodos hijos
+        const nodeContent = `
+    <div class="${node.depth === 0 ? 'box__root' : 'box'}" style="width:${node.width}px;height:${node.height}px;">
       <div>
         <span class="center">${node.data.customName}</span>
         ${generateDynamicContent()}
+        ${removeButton} <!-- Botón solo en hojas -->
       </div>
     </div>
   `;
 
-        // Definir el estilo y estructura para nodos hijos
-        const childContent = `
-    <div class="box" style="width:${node.width}px;height:${node.height}px;">
-      <div>
-        <span class="center">${node.data.customName}</span>
-        ${generateDynamicContent()}
-      </div>
-
-    </div>
-  `;
-
-        return node.depth === 0 ? rootContent : childContent;
+        return nodeContent;
       })
       .onNodeClick((d: any) => this.handleNodeClick(d))
       // Añadir configuración para alinear en un solo eje horizontal
       .compact(false) // Evita el diseño compacto
       .data(this.data)
       .nodeWidth((d:any) => 188)
-      .nodeHeight((d:any) => 366)
+      .nodeHeight((d:any) => 390)
       .childrenMargin((d:any) => 108)
       .siblingsMargin((d:any) => 146)
       .compactMarginBetween((d:any) => 35)
       .compactMarginPair((d:any) => 30)
 
-
       .render();
+     this.chart.expandAll();
 
 
   }

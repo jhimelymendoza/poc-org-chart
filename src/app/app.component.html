@@ -85,6 +85,7 @@
                    [data]="data"
                    [selectedColumns]="selectedColumns"
                    (addNewNode)="addNewNode($event)"
+                   (removeNode)="removeNode($event)"
     ></app-org-chart>
     <div style="height: 300px" *ngIf="activeTableView">
       <br>
